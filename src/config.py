@@ -26,6 +26,11 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 
 SERVICES_INDUSTRIES = {"it services", "consulting"}
 
+COMMON_LOCATIONS = {
+    "pune", "noida", "mumbai", "delhi", "ncr", "hyderabad", "bangalore",
+    "bengaluru", "chennai", "kolkata", "gurugram", "gurgaon", "ahmedabad",
+}
+
 # Flags to prevent wrong negative marking
 NO_GITHUB_SENTINEL = -1
 NO_OFFER_HISTORY_SENTINEL = -1
