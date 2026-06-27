@@ -8,7 +8,7 @@ import os
 
 st.set_page_config(page_title="RedrAI - Candidate Ranker", page_icon="🎯", layout="wide")
 
-st.title("🎯 RedrAI - AI Candidate Ranking Engine")
+st.title("📊 RedrAI - AI Candidate Ranking Engine")
 st.markdown("Upload a Job Description (.txt or .docx) to instantly rank the top 100 candidates from our 100k+ pool using our hybrid semantic and rule-based engine.")
 
 jd_file = st.file_uploader("Upload Job Description", type=["txt", "docx"])
