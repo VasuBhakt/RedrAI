@@ -26,12 +26,17 @@ def main(jd_file: str, out_path: str) -> None:
     print("Loading precomputed embeddings...")
     candidate_embeddings = np.load(config.CANDIDATE_EMBEDDINGS_FILE)
     candidate_ids_order = np.load(config.CANDIDATE_IDS_FILE)
-    jd_embedding = np.load(config.JD_EMBEDDING_FILE)
 
     print("Parsing JD...")
     jd_text = data_loader.load_jd_text(jd_file)
     skill_vocab = data_loader.build_skill_vocabulary(candidates)
     parsed_jd = jd_parser.parse_jd(jd_text, skill_vocab)
+
+    print("Embedding JD live...")
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer(config.EMBEDDING_MODEL)
+    jd_embedding = model.encode(jd_text, convert_to_numpy=True)
+
 
     print("Computing semantic scores...")
     semantic_scores = semantic.compute_semantic_scores(candidate_embeddings, jd_embedding)
