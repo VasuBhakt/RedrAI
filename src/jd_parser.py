@@ -7,7 +7,8 @@ than assuming a fixed template of headers/sections.
 
 import re
 from dataclasses import dataclass, field
-from src.config import COMMON_LOCATIONS
+from src.config import COMMON_LOCATIONS, GENERIC_SKILL_EXCLUSIONS
+
 
 @dataclass
 class ParsedJD:
@@ -32,7 +33,7 @@ def extract_years_range(text: str) -> tuple[float | None, float | None]:
 
 def extract_locations(text: str, known_cities: set[str] = COMMON_LOCATIONS) -> set[str]:
     text_lower = text.lower()
-    return {city for city in known_cities if city in text_lower}
+    return {city for city in known_cities if re.search(r'\b' + re.escape(city) + r'\b', text_lower)}
 
 def extract_notice_period(text: str) -> int | None:
     """Finds patterns like 'sub-30-day notice', '30 day notice period'."""
@@ -43,10 +44,16 @@ def extract_notice_period(text: str) -> int | None:
 
 def extract_required_skills(text: str, skill_vocabulary: set[str]) -> set[str]:
     """Matches against the skill vocabulary built from the candidate dataset
-    (data_loader.build_skill_vocabulary), not a hardcoded list 
+    (data_loader.build_skill_vocabulary), using word boundaries to avoid
+    matching skill names as substrings of unrelated words. Generic
+    non-technical terms are excluded even if present in the vocabulary.
     """
     text_lower = text.lower()
-    return {skill for skill in skill_vocabulary if skill in text_lower}
+    return {
+        skill for skill in skill_vocabulary
+        if skill not in GENERIC_SKILL_EXCLUSIONS
+        and re.search(r'\b' + re.escape(skill) + r'\b', text_lower)
+    }
 
 def parse_jd(jd_text: str, skill_vocabulary: set[str]) -> ParsedJD:
     min_years, max_years = extract_years_range(jd_text)

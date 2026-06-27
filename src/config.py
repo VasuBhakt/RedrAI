@@ -63,3 +63,53 @@ RELEVANT_TITLE_KEYWORDS = {
 
 TOP_N = 100
 RANDOM_SEED = 42
+
+# --- Scorer Component Weights ---
+SKILL_OVERLAP_WEIGHT = 0.5
+SKILL_DEPTH_WEIGHT = 0.5
+EXP_FIT_WEIGHT = 0.6
+CODING_FIT_WEIGHT = 0.4
+
+# --- Behavioral Component Weights & Scores ---
+RESPONSE_RATE_WEIGHT = 0.6
+OPEN_TO_WORK_WEIGHT = 0.4
+OPEN_TO_WORK_SCORE = 1.0
+NOT_OPEN_TO_WORK_SCORE = 0.3
+
+GITHUB_NO_LINK_SCORE = 0.5
+
+LOCATION_MATCH_SCORE = 1.0
+LOCATION_NO_MATCH_SCORE = 0.3
+NOTICE_NEUTRAL_SCORE = 0.7
+
+BEHAVIORAL_ACTIVITY_WEIGHT = 0.5
+BEHAVIORAL_GITHUB_WEIGHT = 0.2
+BEHAVIORAL_LOCATION_WEIGHT = 0.3
+
+# --- Experience Fit Configurations ---
+EXP_FIT_NEUTRAL = 0.5
+CODING_STALE_SCORE = 0.3
+CODING_RECENT_SCORE = 0.7
+STALE_MONTHS_THRESHOLD = 18
+NON_CODING_MARKERS = ["architect", "tech lead", "engineering manager", "director", "vp", "head of"]
+
+# --- Disqualifier Penalties & Markers ---
+SERVICES_PENALTY = 0.5
+RESEARCH_PENALTY = 0.2
+RESEARCH_MARKERS = ["research scientist", "phd", "postdoc", "academic", "research fellow", "research associate"]
+PRODUCTION_MARKERS = ["production", "deployed", "shipped", "scale", "real-time", "live system"]
+
+# --- Keyword Stuffer Penalty ---
+KEYWORD_STUFFER_PENALTY = 0.4
+IRRELEVANT_TITLE_PENALTY = 0.3
+
+# --- Skill Match Configurations ---
+PROFICIENCY_MAP = {"beginner": 0.25, "intermediate": 0.5, "advanced": 0.75, "expert": 1.0}
+MAX_DURATION_MONTHS = 36
+MAX_ENDORSEMENTS = 30
+
+
+# Generic/non-technical terms that occasionally false-positive match
+# against JD prose even though they aren't genuinely required skills for
+# this role. Reviewed manually; small enough to maintain by hand.
+GENERIC_SKILL_EXCLUSIONS = {"marketing", "sales", "communication", "leadership"}
