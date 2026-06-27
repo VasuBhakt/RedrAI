@@ -5,7 +5,7 @@ rate, notice period, location/relocation fit. Handles sentinel values
 possible score.
 """
 
-from src.config import NO_GITHUB_SENTINEL, NO_OFFER_HISTORY_SENTINEL
+from src import config
 
 
 def activity_score(candidate: dict) -> float:
@@ -15,18 +15,18 @@ def activity_score(candidate: dict) -> float:
     signals = candidate.get("redrob_signals", {})
 
     response_rate = signals.get("recruiter_response_rate", 0.0)
-    open_to_work = 1.0 if signals.get("open_to_work_flag", False) else 0.3
+    open_to_work = config.OPEN_TO_WORK_SCORE if signals.get("open_to_work_flag", False) else config.NOT_OPEN_TO_WORK_SCORE
 
-    return (response_rate * 0.6) + (open_to_work * 0.4)
+    return (response_rate * config.RESPONSE_RATE_WEIGHT) + (open_to_work * config.OPEN_TO_WORK_WEIGHT)
 
 
 def github_score(candidate: dict) -> float:
     """0.5 neutral if no GitHub linked (sentinel -1), not a penalty —
     plenty of strong candidates simply don't link GitHub."""
     signals = candidate.get("redrob_signals", {})
-    score = signals.get("github_activity_score", NO_GITHUB_SENTINEL)
-    if score == NO_GITHUB_SENTINEL:
-        return 0.5
+    score = signals.get("github_activity_score", config.NO_GITHUB_SENTINEL)
+    if score == config.NO_GITHUB_SENTINEL:
+        return config.GITHUB_NO_LINK_SCORE
     return min(score / 100, 1.0)
 
 
@@ -41,11 +41,11 @@ def location_notice_fit(candidate: dict, preferred_locations: set[str],
     location_match = any(loc in location for loc in preferred_locations)
     willing_to_relocate = signals.get("willing_to_relocate", False)
 
-    location_score = 1.0 if (location_match or willing_to_relocate) else 0.3
+    location_score = config.LOCATION_MATCH_SCORE if (location_match or willing_to_relocate) else config.LOCATION_NO_MATCH_SCORE
 
     notice_days = signals.get("notice_period_days", 60)
     if max_notice_days is None:
-        notice_score = 0.7  # neutral if JD didn't specify
+        notice_score = config.NOTICE_NEUTRAL_SCORE  # neutral if JD didn't specify
     elif notice_days <= max_notice_days:
         notice_score = 1.0
     else:
@@ -59,7 +59,7 @@ def behavioral_score(candidate: dict, preferred_locations: set[str],
                        max_notice_days: int | None) -> float:
     """Combined behavioral signal: activity + github + location/notice."""
     return (
-        activity_score(candidate) * 0.5
-        + github_score(candidate) * 0.2
-        + location_notice_fit(candidate, preferred_locations, max_notice_days) * 0.3
+        activity_score(candidate) * config.BEHAVIORAL_ACTIVITY_WEIGHT
+        + github_score(candidate) * config.BEHAVIORAL_GITHUB_WEIGHT
+        + location_notice_fit(candidate, preferred_locations, max_notice_days) * config.BEHAVIORAL_LOCATION_WEIGHT
     )

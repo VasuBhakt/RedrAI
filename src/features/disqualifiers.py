@@ -6,7 +6,7 @@ move forward" rules.
 """
 
 from src.data_loader import get_all_industries
-from src.config import SERVICES_INDUSTRIES
+from src import config
 
 
 def is_services_only_career(candidate: dict) -> bool:
@@ -16,7 +16,7 @@ def is_services_only_career(candidate: dict) -> bool:
     industries = get_all_industries(candidate)
     if not industries:
         return False
-    return industries.issubset(SERVICES_INDUSTRIES)
+    return industries.issubset(config.SERVICES_INDUSTRIES)
 
 
 def is_pure_research_no_production(candidate: dict) -> bool:
@@ -24,10 +24,8 @@ def is_pure_research_no_production(candidate: dict) -> bool:
     with no signal of shipping to production. Heuristic: checks for research
     keywords in titles/descriptions with no 'production'/'deployed'/'shipped'
     language anywhere in their history."""
-    research_markers = ["research scientist", "phd", "postdoc", "academic",
-                          "research fellow", "research associate"]
-    production_markers = ["production", "deployed", "shipped", "scale",
-                            "real-time", "live system"]
+    research_markers = config.RESEARCH_MARKERS
+    production_markers = config.PRODUCTION_MARKERS
 
     full_text = " ".join([
         candidate.get("profile", {}).get("current_title", ""),
@@ -47,9 +45,9 @@ def disqualifier_penalty(candidate: dict, penalize_services_only: bool = True) -
     penalty = 1.0
 
     if penalize_services_only and is_services_only_career(candidate):
-        penalty *= 0.5  # soft penalty, not a hard zero — JD says "case by case"
+        penalty *= config.SERVICES_PENALTY  # soft penalty, not a hard zero — JD says "case by case"
 
     if is_pure_research_no_production(candidate):
-        penalty *= 0.2  # JD explicitly says "we will not move forward"
+        penalty *= config.RESEARCH_PENALTY  # JD explicitly says "we will not move forward"
 
     return penalty

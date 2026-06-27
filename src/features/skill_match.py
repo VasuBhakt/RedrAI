@@ -3,6 +3,7 @@ Skill overlap and depth scoring between a candidate and a parsed JD.
 """
 
 from src.data_loader import get_skill_names
+from src import config
 
 
 def skill_overlap_score(candidate: dict, required_skills: set[str]) -> float:
@@ -28,13 +29,11 @@ def skill_depth_score(candidate: dict, required_skills: set[str]) -> float:
     if not matched:
         return 0.0
 
-    proficiency_map = {"beginner": 0.25, "intermediate": 0.5, "advanced": 0.75, "expert": 1.0}
-
     scores = []
     for s in matched:
-        prof = proficiency_map.get(s.get("proficiency", "beginner"), 0.25)
-        duration_factor = min(s.get("duration_months", 0) / 36, 1.0)  # cap at 3 years
-        endorsement_factor = min(s.get("endorsements", 0) / 30, 1.0)  # cap at 30 endorsements
+        prof = config.PROFICIENCY_MAP.get(s.get("proficiency", "beginner"), 0.25)
+        duration_factor = min(s.get("duration_months", 0) / config.MAX_DURATION_MONTHS, 1.0)  # cap at config defined duration
+        endorsement_factor = min(s.get("endorsements", 0) / config.MAX_ENDORSEMENTS, 1.0)  # cap at config defined endorsements
         scores.append((prof + duration_factor + endorsement_factor) / 3)
 
     return sum(scores) / len(scores)

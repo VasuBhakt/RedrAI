@@ -4,6 +4,7 @@ basic "active production coder" check from career history recency.
 """
 
 from datetime import date
+from src import config
 
 
 def experience_years_fit(candidate: dict, min_years: float | None, max_years: float | None) -> float:
@@ -12,7 +13,7 @@ def experience_years_fit(candidate: dict, min_years: float | None, max_years: fl
     """
     years = candidate.get("profile", {}).get("years_of_experience", 0)
     if min_years is None:
-        return 0.5
+        return config.EXP_FIT_NEUTRAL
 
     if max_years is None:
         max_years = min_years + 5  # loose upper fallback
@@ -28,7 +29,7 @@ def experience_years_fit(candidate: dict, min_years: float | None, max_years: fl
     return max(0.0, 1.0 - gap / max_years)
 
 
-def recent_coding_score(candidate: dict, stale_months_threshold: int = 18) -> float:
+def recent_coding_score(candidate: dict, stale_months_threshold: int = config.STALE_MONTHS_THRESHOLD) -> float:
     """Penalizes candidates whose current role title suggests they've
     moved away from hands-on coding (architect/lead/manager titles) AND
     have held that role for longer than the staleness threshold.
@@ -38,8 +39,7 @@ def recent_coding_score(candidate: dict, stale_months_threshold: int = 18) -> fl
     architecture/tech lead roles.'
     """
     current_title = candidate.get("profile", {}).get("current_title", "").lower()
-    non_coding_markers = ["architect", "tech lead", "engineering manager",
-                            "director", "vp", "head of"]
+    non_coding_markers = config.NON_CODING_MARKERS
 
     if not any(marker in current_title for marker in non_coding_markers):
         return 1.0  # title suggests still hands-on
@@ -54,5 +54,5 @@ def recent_coding_score(candidate: dict, stale_months_threshold: int = 18) -> fl
 
     duration = current_job.get("duration_months", 0)
     if duration > stale_months_threshold:
-        return 0.3  # likely stale on hands-on coding
-    return 0.7  # recently moved, some benefit of the doubt
+        return config.CODING_STALE_SCORE  # likely stale on hands-on coding
+    return config.CODING_RECENT_SCORE  # recently moved, some benefit of the doubt
