@@ -35,11 +35,11 @@ def score_candidate(candidate: dict, parsed_jd: ParsedJD, semantic_score: float)
 
     skill_overlap = skill_match.skill_overlap_score(candidate, parsed_jd.required_skills)
     skill_depth = skill_match.skill_depth_score(candidate, parsed_jd.required_skills)
-    skill_combined = (skill_overlap * 0.5) + (skill_depth * 0.5)
+    skill_combined = (skill_overlap * config.SKILL_OVERLAP_WEIGHT) + (skill_depth * config.SKILL_DEPTH_WEIGHT)
 
     exp_fit = experience_fit.experience_years_fit(candidate, parsed_jd.min_years, parsed_jd.max_years)
     coding_fit = experience_fit.recent_coding_score(candidate)
-    experience_combined = (exp_fit * 0.6) + (coding_fit * 0.4)
+    experience_combined = (exp_fit * config.EXP_FIT_WEIGHT) + (coding_fit * config.CODING_FIT_WEIGHT)
 
     behavioral_combined = behavioral.behavioral_score(
         candidate, parsed_jd.preferred_locations, parsed_jd.max_notice_days
@@ -59,19 +59,28 @@ def score_candidate(candidate: dict, parsed_jd: ParsedJD, semantic_score: float)
     # encodes the JD's explicit warning: "a candidate who has all the AI
     # keywords listed as skills but whose title is 'Marketing Manager' is
     # not a fit, no matter how perfect their skill list looks."
-    current_title_lower = candidate.get("profile", {}).get("current_title", "").lower()
-    title_is_relevant = any(kw in current_title_lower for kw in config.RELEVANT_TITLE_KEYWORDS)
+    titles_to_check = [candidate.get("profile", {}).get("current_title", "").lower()]
+    for job in candidate.get("career_history", [])[:2]:
+        titles_to_check.append(job.get("title", "").lower())
+        
+    title_is_relevant = any(
+        kw in title
+        for title in titles_to_check
+        for kw in config.RELEVANT_TITLE_KEYWORDS
+    )
+
+    if not title_is_relevant:
+        if n_skill_matches >= config.HIGH_SKILL_MATCH_THRESHOLD:
+            # High skills + irrelevant title = classic keyword stuffer trap
+            raw_score *= config.KEYWORD_STUFFER_PENALTY
+        else:
+            # General irrelevant domain penalty
+            raw_score *= config.IRRELEVANT_TITLE_PENALTY
 
     if n_skill_matches < MIN_SKILL_MATCHES_FOR_FULL_SCORE:
         raw_score *= LOW_SKILL_MATCH_PENALTY
-    elif n_skill_matches >= config.HIGH_SKILL_MATCH_THRESHOLD:
-        if title_is_relevant:
-            raw_score *= config.HIGH_SKILL_MATCH_BOOST
-        else:
-            # High skill count but irrelevant title = classic keyword-
-            # stuffing trap candidate. Penalize harder than a normal
-            # low-match candidate since this pattern is worse, not better.
-            raw_score *= 0.4
+    elif n_skill_matches >= config.HIGH_SKILL_MATCH_THRESHOLD and title_is_relevant:
+        raw_score *= config.HIGH_SKILL_MATCH_BOOST
 
     final_score = raw_score * penalty
 
