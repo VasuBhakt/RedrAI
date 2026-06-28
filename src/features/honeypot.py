@@ -48,10 +48,31 @@ def has_too_many_expert_skills(candidate: dict, threshold: int = 8) -> bool:
     return expert_count >= threshold
 
 
+def has_impossible_skill_duration(candidate: dict) -> bool:
+    """Flags candidates who claim a skill duration that exceeds their
+    entire total career experience."""
+    stated_years = candidate.get("profile", {}).get("years_of_experience")
+    
+    # Fallback to sum of history if stated years isn't there
+    if stated_years is None:
+        history = candidate.get("career_history", [])
+        total_months = sum(j.get("duration_months", 0) for j in history)
+        stated_years = total_months / 12
+
+    max_allowed_months = stated_years * 12 + 12  # 1 year buffer for overlaps
+    
+    for skill in candidate.get("skills", []):
+        duration = skill.get("duration_months", 0)
+        if duration > max_allowed_months:
+            return True
+    return False
+
+
 def is_honeypot(candidate: dict) -> bool:
     """True if ANY honeypot pattern is detected."""
     return (
         has_impossible_skill_claims(candidate)
         or has_inconsistent_experience(candidate)
         or has_too_many_expert_skills(candidate)
+        or has_impossible_skill_duration(candidate)
     )

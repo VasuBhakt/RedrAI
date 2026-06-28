@@ -77,6 +77,14 @@ raw_score = (
 - **`LOW_SKILL_MATCH_PENALTY` (x0.5)**: Applied if a candidate has high semantic overlap (generic good English) but fails to possess the `MIN_SKILL_MATCHES_FOR_FULL_SCORE` core technical skills.
 - **Disqualifiers**: The score is finally multiplied by penalties like `SERVICES_PENALTY` or `RESEARCH_PENALTY` if the candidate's background is exclusively non-product-focused.
 
+## 🛡️ Adversarial Testing Suite
+
+To ensure algorithmic integrity, RedrAI includes an adversarial testing suite (`pytest tests/`) that actively attempts to exploit the ranking engine:
+- **Keyword Stuffer Protection**: Injects candidates who copy-paste the exact JD skills but hold irrelevant titles (e.g. "Barista"). Tests prove the penalty correctly sinks their score.
+- **Honeypot Exploits**: Injects temporal anomalies (e.g., claiming 60 months of PyTorch experience with only 24 months of total career history) to ensure the deterministic honeypot detector instantly disqualifies them.
+- **Null Profile Robustness**: Injects completely empty candidates missing `profile`, `skills`, and `career_history` entirely, proving the pipeline gracefully handles null data without crashing the batch run.
+- **Title Boosting**: Validates that specialized titles (e.g., "ML Engineer") mathematically outrank generic titles (e.g., "Software Engineer") when semantic and skill matches are identical.
+
 ---
 
 ## 🚀 Setup & Usage
@@ -108,7 +116,10 @@ python -m src.rank --jd_file data/raw/job_description.txt
 ```bash
 python validate_submission.py output/submission.csv
 ```
-
+**6. Testing:**
+```bash
+python -m pytest tests/
+```
 ---
 
 ## 👥 Team Details
