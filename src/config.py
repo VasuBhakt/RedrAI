@@ -69,6 +69,12 @@ RELEVANT_TITLE_KEYWORDS = {
     "software engineer", "backend engineer",
 }
 
+HIGHLY_RELEVANT_TITLE_KEYWORDS = {
+    "ai", "ml", "machine learning", "nlp", "data scientist", "data engineer",
+    "search engineer", "recommendation", "research engineer", "applied ml"
+}
+HIGHLY_RELEVANT_TITLE_BOOST = 1.2
+
 TOP_N = 100
 RANDOM_SEED = 42
 

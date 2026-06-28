@@ -6,7 +6,7 @@ import sys
 import subprocess
 import os
 
-st.set_page_config(page_title="RedrAI - Candidate Ranker", page_icon="🎯", layout="wide")
+st.set_page_config(page_title="RedrAI - Candidate Ranker", layout="wide")
 
 st.title("📊 RedrAI - AI Candidate Ranking Engine")
 st.markdown("Upload a Job Description (.txt or .docx) to instantly rank the top 100 candidates from our 100k+ pool using our hybrid semantic and rule-based engine.")
@@ -15,7 +15,7 @@ jd_file = st.file_uploader("Upload Job Description", type=["txt", "docx"])
 
 if jd_file is not None:
     if st.button("Run Ranking Engine"):
-        with st.spinner("Processing 100,000+ candidates (usually takes ~40 seconds)..."):
+        with st.spinner("Processing candidates (usually takes ~40 seconds)..."):
             # Save uploaded file to a temporary location
             suffix = Path(jd_file.name).suffix
             with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:

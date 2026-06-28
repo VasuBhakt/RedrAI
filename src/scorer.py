@@ -68,6 +68,12 @@ def score_candidate(candidate: dict, parsed_jd: ParsedJD, semantic_score: float)
         for title in titles_to_check
         for kw in config.RELEVANT_TITLE_KEYWORDS
     )
+    
+    title_is_highly_relevant = any(
+        kw in title
+        for title in titles_to_check
+        for kw in config.HIGHLY_RELEVANT_TITLE_KEYWORDS
+    )
 
     if not title_is_relevant:
         if n_skill_matches >= config.HIGH_SKILL_MATCH_THRESHOLD:
@@ -76,6 +82,8 @@ def score_candidate(candidate: dict, parsed_jd: ParsedJD, semantic_score: float)
         else:
             # General irrelevant domain penalty
             raw_score *= config.IRRELEVANT_TITLE_PENALTY
+    elif title_is_highly_relevant:
+        raw_score *= config.HIGHLY_RELEVANT_TITLE_BOOST
 
     if n_skill_matches < MIN_SKILL_MATCHES_FOR_FULL_SCORE:
         raw_score *= LOW_SKILL_MATCH_PENALTY
