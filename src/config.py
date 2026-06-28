@@ -18,6 +18,14 @@ CANDIDATE_EMBEDDINGS_FILE = DATA_PREPROCESSED_DIR / "candidate_embeddings.npy"
 CANDIDATE_IDS_FILE = DATA_PREPROCESSED_DIR / "candidate_ids.npy"
 JD_EMBEDDING_FILE = DATA_PREPROCESSED_DIR / "jd_embedding.npy"
 
+# --- Sandbox Cloud Fallback ---
+if not CANDIDATES_FILE.exists():
+    sandbox_dir = ROOT_DIR / "sandbox_data"
+    if (sandbox_dir / "candidates.jsonl").exists():
+        CANDIDATES_FILE = sandbox_dir / "candidates.jsonl"
+        CANDIDATE_EMBEDDINGS_FILE = sandbox_dir / "candidate_embeddings.npy"
+        CANDIDATE_IDS_FILE = sandbox_dir / "candidate_ids.npy"
+
 SUBMISSION_FILE = OUTPUT_DIR / "submission.csv"
 
 # Embedding Model
