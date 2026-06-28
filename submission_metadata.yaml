@@ -7,35 +7,31 @@
 # ============================================================================
 # Team identity
 # ============================================================================
-team_name: "your-team-name-here"  # Used in leaderboard and announcements
+team_name: "Pixentropy"  # Used in leaderboard and announcements
 
 primary_contact:
-  name: "Full Name"
-  email: "primary@example.com"   # Used for all organizer communication
-  phone: "+91-XXXXXXXXXX"        # Used for top-50 / top-10 outreach
+  name: "Swastik Bose"
+  email: "swastikbose31@gmail.com"   # Used for all organizer communication
+  phone: "+91-8240804967"        # Used for top-50 / top-10 outreach
 
 team_members:
-  - name: "Member 1 Full Name"
-    email: "member1@example.com"
-    role: "ML Engineer"          # Optional, e.g. "Team Lead", "Backend", "Data"
-  - name: "Member 2 Full Name"
-    email: "member2@example.com"
-    role: "Data Engineer"
-  # Add more members as needed; solo participants list just one member
+  - name: "Swastik Bose"
+    email: "swastikbose31@gmail.com"
+    role: "Team Lead"          # Optional, e.g. "Team Lead", "Backend", "Data"
 
 # ============================================================================
 # Code and reproducibility
 # ============================================================================
-github_repo: "https://github.com/YOUR_USERNAME/YOUR_REPO"
+github_repo: "https://github.com/VasuBhakt/RedrAI"
 # Required. Must be reachable. Private repos OK if you can grant organizer
 # access at Stage 3 (the email to add will be communicated then).
 
-sandbox_link: "https://huggingface.co/spaces/YOUR_USERNAME/redrob-ranker"
+sandbox_link: "https://redrai-pixentropy.streamlit.app"
 # Required. A working hosted environment where the ranker can be run on a small
 # candidate sample. See Section 10.5 of submission_spec.md for acceptable
 # platforms (HuggingFace Spaces, Streamlit Cloud, Replit, Colab, Docker, Binder).
 
-reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submission.csv"
+reproduce_command: "python -m src.rank --jd_file data/raw/job_description.txt"
 # The single command that produces submission.csv from candidates.jsonl.
 # Should run end-to-end within 5 minutes on CPU with 16GB RAM and no network.
 
@@ -43,15 +39,15 @@ reproduce_command: "python rank.py --candidates ./candidates.jsonl --out ./submi
 # Compute environment
 # ============================================================================
 compute:
-  platform: "MacBook Pro M2"                    # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
-  cpu_cores: 8                                  # Number of CPU cores used
+  platform: "Local Windows 10 Box"              # Or: "AWS EC2 c5.4xlarge", "Local Linux box", etc.
+  cpu_cores: 10                                 # Number of CPU cores used
   ram_gb: 16                                    # Available RAM in GB
-  python_version: "3.11.4"                      # python --version
-  os: "macOS 14.2"                              # Or "Ubuntu 22.04 LTS", etc.
+  python_version: "3.11.7"                      # python --version
+  os: "Windows 10"                              # Or "Ubuntu 22.04 LTS", etc.
   uses_gpu_for_inference: false                 # Must be false — see compute constraints
   has_network_during_ranking: false             # Must be false — no API calls during ranking
-  pre_computation_required: false               # true if you pre-compute embeddings or train models offline
-  pre_computation_time_minutes: 0               # Approximate, if applicable
+  pre_computation_required: true                # true if you pre-compute embeddings or train models offline
+  pre_computation_time_minutes: 120             # Approximate, if applicable
 
 # ============================================================================
 # AI tools declaration
@@ -60,30 +56,24 @@ compute:
 # may verify these declarations against your code; declarations that contradict
 # your code or your interview are flagged.
 ai_tools_used:
-  - "Claude"        # e.g. for architecture discussion, code review
-  - "GitHub Copilot"  # e.g. for autocomplete
+  - "Claude"        
+  - "Gemini (Antigravity IDE)" 
   # Other options: "ChatGPT", "Cursor", "Gemini", "Codeium", "Other", "None"
 
 ai_usage_summary: |
-  Briefly describe how AI tools were used. Examples:
-  - "Used Claude for code review and architectural discussion. Used Copilot for autocomplete.
-     No candidate data was fed to any LLM."
-  - "Used ChatGPT to debug Python issues and Cursor for refactoring."
-  - "No AI tools used."
+  - "Used Gemini (Antigravity IDE) and Claude for architectural discussion, code refactoring, and optimizing the reasoning string templates."
+  - "No candidate data or CVs were fed into any LLMs during the actual ranking process (zero runtime LLM dependency)."
 
 # ============================================================================
 # Approach summary (optional but recommended)
 # ============================================================================
 methodology_summary: |
-  ≤200 word summary of your approach. Strongly recommended.
-
-  Example:
-  "Rule-based ranker with explicit reasoning capture. Five scoring components
-  (skills, title+career, experience years, location, education) combined with
-  a multiplicative behavioral-signal modifier. The title component is the
-  decisive signal against keyword-stuffer traps; an endorsement-and-duration
-  trust multiplier on skills catches lazy keyword stuffing. Runtime is ~10
-  seconds for 50K candidates on CPU."
+  RedrAI is a rule-based and semantic hybrid ranking engine that runs fully locally under the 5-minute CPU constraint. All weights and penalties are parameterized in src/config.py.
+  Candidate narratives (summaries + career histories) are embedded offline using sentence-transformers (all-MiniLM-L6-v2). The JD is encoded dynamically at runtime. We use NumPy matrix multiplication (a 100k × 384 dot product) to compute cosine similarity across the dataset.
+  We parse the JD to extract required skills, locations, and experience bounds. Candidates matching fewer than `MIN_SKILL_MATCHES_FOR_FULL_SCORE` are penalized (LOW_SKILL_MATCH_PENALTY), while those hitting high skill thresholds `HIGH_SKILL_MATCH_THRESHOLD` with relevant career trajectories are boosted (HIGH_SKILL_MATCH_BOOST). A title-relevance check (KEYWORD_STUFFER_PENALTY) penalizes keyword stuffers (e.g., Mechanical Engineers claiming AI skills), while genuine AI/ML titles get a separate boost (HIGHLY_RELEVANT_TITLE_BOOST).
+  Behavioral signals — responsiveness, GitHub activity, location/notice fit — are also factored in. Deterministic honeypot detection flags candidates with impossible skill-depth or duration claims.
+  Reasoning strings are generated deterministically from computed scores, guaranteeing zero hallucinations. The full pipeline runs in under 2 minutes for 100k candidates, CPU only.
+  An adversarial testing suite (pytest) aggressively protects algorithmic integrity against keyword stuffers, missing data, and honeypot exploits.
 
 # ============================================================================
 # Declarations
@@ -92,5 +82,5 @@ declarations:
   read_submission_spec: true        # I have read submission_spec.md in full
   code_is_original_work: true       # My code is my team's original work (using AI as a tool is fine)
   no_collusion: true                # I have not coordinated my submission with other teams
-  honeypot_check_done: false        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
+  honeypot_check_done: true        # OPTIONAL — set true if you explicitly checked for honeypots in your ranking
   reproduction_tested: true         # I have tested that my reproduce_command runs end-to-end

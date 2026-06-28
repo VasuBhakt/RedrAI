@@ -101,14 +101,15 @@ streamlit run app.py
 ```
 
 **3. (Offline) Precompute Embeddings (For Full 100k Dataset):**
-*Note: Only run this if the `candidates.jsonl` changes.*
+*Note: Only run this if the `candidates.jsonl` changes. This is the precomputation step permitted by Section 10.3.*
 ```bash
-python -m src.precompute_embeddings --jd_file data/raw/job_description.docx
+python -m src.precompute --candidates_file data/raw/candidates.jsonl
 ```
 
 **4. (Online) Rank Candidates (Timed Run):**
-Generates `submission.csv` in the `output/` directory in under 1 minute for all 100k candidates.
+Generates `submission.csv` in the `output/` directory in under 1 minute for all 100k candidates. The `HF_HUB_OFFLINE=1` flag ensures strict compliance with the no-network rule by preventing the tokenizer from checking for updates.
 ```bash
+export HF_HUB_OFFLINE=1
 python -m src.rank --jd_file data/raw/job_description.txt
 ```
 

@@ -9,6 +9,11 @@ Usage:
 
 import argparse
 import time
+import os
+
+# Guarantee offline mode for HF Hub to prevent network timeout crashes in Docker
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
 
 import numpy as np
 import pandas as pd
