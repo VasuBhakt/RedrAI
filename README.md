@@ -95,7 +95,7 @@ pip install -r requirements.txt
 ```
 
 **2. (Optional) Run the Streamlit Sandbox:**
-Launch an interactive UI to test the engine on our 5,000-candidate sample dataset.
+Launch an interactive UI to test the engine on our pre-loaded 10,000-candidate sample dataset (this fulfills the "pre-loaded small candidate sample" requirement from Section 10.5 of the spec).
 ```bash
 streamlit run app.py
 ```

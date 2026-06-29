@@ -11,6 +11,8 @@ st.set_page_config(page_title="RedrAI - Candidate Ranker", layout="wide")
 st.title("📊 RedrAI - AI Candidate Ranking Engine")
 st.markdown("Upload a Job Description (.txt or .docx) to instantly rank the top 100 candidates from our 100k+ pool using our hybrid semantic and rule-based engine.")
 
+st.info("ℹ️ **Hackathon Sandbox Mode:** This hosted environment is pre-loaded with a representative 10,000-candidate sample (`sandbox_data`) to demonstrate end-to-end reproducibility as per the submission specification.")
+
 jd_file = st.file_uploader("Upload Job Description", type=["txt", "docx"])
 
 if jd_file is not None:
