@@ -1,6 +1,6 @@
 # 📊 RedrAI - Candidate Ranking Engine
 
-An optimized, hybrid ranking system that evaluates candidate profiles against a Job Description. This engine is built specifically to operate under strict constraints: it evaluates 100k candidates in under a minute on CPU, utilizing precomputed embeddings for the heavy lifting and deterministic rule-based checks for domain relevance.
+An optimized, hybrid ranking system that evaluates candidate profiles against a Job Description. This engine is built specifically to operate under strict constraints: it evaluates 100k candidates in under 2 minutes on CPU, utilizing precomputed embeddings for the heavy lifting and deterministic rule-based checks for domain relevance.
 
 This is the **INDIA RUNS Hackathon 2026 by Redrob** submission for Team **Pixentropy**. 
 
@@ -107,7 +107,7 @@ python -m src.precompute --candidates_file data/raw/candidates.jsonl
 ```
 
 **4. (Online) Rank Candidates (Timed Run):**
-Generates `submission.csv` in the `output/` directory in under 1 minute for all 100k candidates. The `HF_HUB_OFFLINE=1` flag ensures strict compliance with the no-network rule by preventing the tokenizer from checking for updates.
+Generates `submission.csv` in the `output/` directory in under 2 minutes for all 100k candidates. The `HF_HUB_OFFLINE=1` flag ensures strict compliance with the no-network rule by preventing the tokenizer from checking for updates.
 ```bash
 export HF_HUB_OFFLINE=1
 python -m src.rank --jd_file data/raw/job_description.txt
